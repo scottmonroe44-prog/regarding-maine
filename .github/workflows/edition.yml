@@ -1,0 +1,68 @@
+name: Regarding Maine edition
+
+on:
+  schedule:
+    # Run at both the EDT and EST UTC offsets; the gate step keeps only 6 AM and 5 PM Eastern.
+    - cron: "10 10,11 * * *"
+    - cron: "10 21,22 * * *"
+  workflow_dispatch:
+    inputs:
+      edition:
+        description: "morning, evening or auto"
+        default: auto
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: regarding-maine
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Gate on Eastern time
+        id: gate
+        run: |
+          hour=$(TZ=America/New_York date +%H)
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$hour" != "06" ] && [ "$hour" != "17" ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'true'
+
+      - uses: actions/setup-python@v5
+        if: steps.gate.outputs.run == 'true'
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        if: steps.gate.outputs.run == 'true'
+        run: pip install -r requirements.txt
+
+      - name: Build edition
+        if: steps.gate.outputs.run == 'true'
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          RM_SLUG: ${{ secrets.RM_SLUG }}
+          RM_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ secrets.RM_SLUG }}
+        run: python -m pipeline.run --edition "${{ inputs.edition || 'auto' }}"
+
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.gate.outputs.run == 'true'
+        with:
+          path: dist
+
+      - id: deploy
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/deploy-pages@v4

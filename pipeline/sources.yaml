@@ -1,0 +1,45 @@
+# Feeds verified 2026-10-26. Add more feed URLs per outlet to widen coverage.
+sources:
+  - id: pph
+    name: Portland Press Herald
+    short: Press Herald
+    feeds:
+      - https://www.pressherald.com/feed/
+  - id: bdn
+    name: Bangor Daily News
+    short: BDN
+    feeds:
+      - https://www.bangordailynews.com/feed/
+  - id: mpbn
+    name: Maine Public
+    short: Maine Public
+    feeds:
+      - https://www.mainepublic.org/news.rss
+      - https://www.mainepublic.org/politics.rss
+  - id: ncm
+    name: NEWS CENTER Maine
+    short: NEWS CENTER
+    feeds:
+      - https://www.newscentermaine.com/feeds/syndication/rss/news
+  - id: monitor
+    name: The Maine Monitor
+    short: Maine Monitor
+    feeds:
+      - https://themainemonitor.org/feed/
+  - id: villager
+    name: Midcoast Villager
+    short: Midcoast Villager
+    feeds:
+      - "https://www.midcoastvillager.com/search/?f=rss&t=article&c=news&l=25&s=start_time&sd=desc"
+
+# Items whose title or category tags match are dropped.
+exclude_patterns:
+  - obituar
+  - crossword
+  - horoscope
+  - wordle
+  - letters? to the editor
+  - "^photos?:"
+  - "^video:"
+  - high school (scores|roundup)
+  - \bpuzzle

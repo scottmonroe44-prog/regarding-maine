@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f3d36">
+<meta name="robots" content="noindex, nofollow">
+<title>Regarding Maine</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#f6f1e7;--card:#fffdf8;--ink:#1d2623;--mute:#6a7570;--line:#e3dccd;--pine:#1f3d36;--accent:#b5412e;--chip:#e9efe9}
+@media (prefers-color-scheme:dark){:root{--bg:#101614;--card:#18211e;--ink:#eae6dc;--mute:#9aa6a0;--line:#2a3733;--pine:#27493f;--accent:#e0705b;--chip:#233029}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 Georgia,"Iowan Old Style",serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:680px;margin:0 auto;padding:0 16px calc(32px + env(safe-area-inset-bottom))}
+header{background:var(--pine);color:#fff;padding:calc(18px + env(safe-area-inset-top)) 16px 18px}
+header .in{max-width:680px;margin:0 auto}
+h1{margin:0;font-size:26px;letter-spacing:.2px}
+header p{margin:2px 0 0;opacity:.8;font:14px system-ui,sans-serif}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:14px 0 4px;font:14px system-ui,sans-serif}
+.tabs button{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:7px 14px;font:inherit}
+.tabs button[aria-current=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.player{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin:12px 0}
+.player b{font:600 14px system-ui,sans-serif;display:block;margin-bottom:8px}
+audio{width:100%}
+.story{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:12px 0}
+.story h2{margin:0 0 6px;font-size:20px;line-height:1.25}
+.story p{margin:6px 0}
+.why{color:var(--mute);font-size:15px}
+.talk{border-left:3px solid var(--accent);padding-left:10px;margin:10px 0 4px;font-style:italic}
+.links{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font:13px system-ui,sans-serif}
+.links a{background:var(--chip);color:var(--ink);text-decoration:none;border-radius:999px;padding:5px 11px}
+.links a:active{background:var(--line)}
+.meta{font:13px system-ui,sans-serif;color:var(--mute)}
+.foot{margin-top:24px;font:14px system-ui,sans-serif;color:var(--mute)}
+.foot button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:8px 12px}
+.empty{padding:40px 0;text-align:center;color:var(--mute)}
+</style>
+</head>
+<body>
+<header><div class="in"><h1>Regarding Maine</h1><p>The Maine news worth knowing</p></div></header>
+<div class="wrap">
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <div id="main"><div class="empty">Loading…</div></div>
+  <div class="foot">
+    <button id="copy">Copy podcast feed link</button>
+    <p>Paste it into Apple Podcasts (Library → Follow a Show by URL), Overcast, Pocket Casts, or AntennaPod.
+    Summaries are written by AI from headlines and excerpts; follow the links for the full reporting.</p>
+  </div>
+</div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let editions = [], current = 0;
+
+function render() {
+  const ed = editions[current];
+  $("#tabs").innerHTML = editions.slice(0, 8).map((e, i) =>
+    `<button role="tab" aria-current="${i === current}" data-i="${i}">${esc(e.label)} · ${esc(e.date_text.replace(/^\w+, /, ""))}</button>`).join("");
+  const audio = ed.audio ? `<div class="player"><b>Listen · ${Math.round(ed.audio.seconds / 60)} min</b>
+      <audio controls preload="none" src="episodes/${esc(ed.id)}.mp3"></audio></div>` : "";
+  const stories = ed.stories.map(s => `
+    <article class="story">
+      <h2>${esc(s.headline)}</h2>
+      <p>${esc(s.summary)}</p>
+      ${s.why ? `<p class="why">${esc(s.why)}</p>` : ""}
+      ${s.talk ? `<p class="talk">${esc(s.talk)}</p>` : ""}
+      <div class="links">${s.links.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.outlet)}</a>`).join("")}</div>
+    </article>`).join("");
+  $("#main").innerHTML = `<p class="meta">${esc(ed.title)}</p>${audio}${stories}`;
+}
+
+$("#tabs").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (b) { current = +b.dataset.i; render(); scrollTo(0, 0); }
+});
+$("#copy").addEventListener("click", async () => {
+  const url = new URL("feed.xml", location.href).href;
+  try { await navigator.clipboard.writeText(url); $("#copy").textContent = "Copied!"; }
+  catch { prompt("Podcast feed URL", url); }
+});
+
+fetch("data/editions.json", {cache: "no-cache"}).then(r => r.json()).then(d => {
+  editions = d;
+  if (!d.length) { $("#main").innerHTML = '<div class="empty">No editions yet.</div>'; return; }
+  render();
+}).catch(() => { $("#main").innerHTML = '<div class="empty">Could not load the latest edition.</div>'; });
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
