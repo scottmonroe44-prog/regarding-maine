@@ -16,7 +16,7 @@ def _story_input(c):
         "id": c["id"],
         "outlets": sorted({i["source_name"] for i in c["items"]}),
         "headlines": [i["title"] for i in c["items"]],
-        "excerpts": [i["summary"] for i in c["items"] if i["summary"]][:3],
+        "text": [i.get("text") or i["summary"] for i in c["items"][:2] if i.get("text") or i["summary"]],
     }
 
 
@@ -31,7 +31,7 @@ def build_digest(clusters):
         try:
             prompt = (
                 "Write a brief news digest for a Maine news briefing called 'Regarding Maine'.\n"
-                "For each story below write, in your OWN words (never copy sentences from the excerpts):\n"
+                "For each story below write, in your OWN words (never copy sentences from the article text; get names, places and numbers exactly right):\n"
                 '- "headline": a plain, punchy headline under 12 words\n'
                 '- "summary": 2 sentences, 45 words max, factual, no hype, based only on the material given\n'
                 '- "why": one short sentence on why a Mainer might care (or empty string)\n'

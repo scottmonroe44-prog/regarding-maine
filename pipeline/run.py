@@ -4,7 +4,7 @@ import sys
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-from . import digest, ingest, publish, rank
+from . import digest, fulltext, ingest, publish, rank
 
 ET = ZoneInfo("America/New_York")
 
@@ -36,6 +36,7 @@ def main():
         sys.exit("Too few items fetched; refusing to publish a thin edition.")
 
     chosen = rank.select(items, count=args.count)
+    fulltext.enrich(chosen)
     stories = digest.build_digest(chosen)
     script = digest.build_script(stories, label, date_text)
 

@@ -1,6 +1,7 @@
 feedparser==6.0.11
 requests==2.32.3
 PyYAML==6.0.2
+beautifulsoup4>=4.12
 edge-tts>=7.3.1
 mutagen==1.47.0
 tzdata

@@ -88,6 +88,7 @@ def ingest(max_age_hours=48, config=None):
                     "url": link,
                     "published": published.isoformat(),
                     "summary": summary[:600],
+                    "content": clean("".join(c.get("value", "") for c in entry.get("content", [])))[:6000],
                     "tags": tags,
                     "position": pos,
                 })
