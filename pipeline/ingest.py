@@ -84,6 +84,7 @@ def ingest(max_age_hours=48, config=None):
                     "source": src["id"],
                     "source_name": src["name"],
                     "source_short": src["short"],
+                    "source_spoken": src.get("spoken", src["name"]),
                     "title": title,
                     "url": link,
                     "published": published.isoformat(),

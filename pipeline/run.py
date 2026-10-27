@@ -38,7 +38,7 @@ def main():
     chosen = rank.select(items, count=args.count)
     fulltext.enrich(chosen)
     stories = digest.build_digest(chosen)
-    script = digest.build_script(stories, label, date_text)
+    script = digest.build_script(stories, chosen, label, date_text)
 
     out = publish.site_dir()
     publish.restore_state(out)

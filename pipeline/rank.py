@@ -35,7 +35,7 @@ def cluster(items):
             clusters.append({"items": [item], "tokens": set(toks)})
     for n, c in enumerate(clusters):
         c["id"] = n
-        c["items"].sort(key=lambda i: i["published"], reverse=True)
+        c["items"].sort(key=lambda i: i["published"])  # earliest first: items[0] is the lead outlet
     return clusters
 
 

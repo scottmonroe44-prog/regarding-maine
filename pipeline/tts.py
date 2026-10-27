@@ -8,8 +8,8 @@ from pathlib import Path
 import edge_tts
 from mutagen.mp3 import MP3
 
-VOICE = os.environ.get("RM_VOICE", "en-US-AndrewNeural")
-RATE = os.environ.get("RM_RATE", "+0%")
+VOICE = os.environ.get("RM_VOICE") or "en-US-AndrewNeural"
+RATE = os.environ.get("RM_RATE") or "+0%"
 CHUNK_CHARS = 2800
 
 

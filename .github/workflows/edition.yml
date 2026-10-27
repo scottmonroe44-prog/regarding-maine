@@ -55,6 +55,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           RM_SLUG: ${{ secrets.RM_SLUG }}
+          RM_VOICE: ${{ vars.RM_VOICE }}
           RM_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ secrets.RM_SLUG }}
         run: python -m pipeline.run --edition "${{ inputs.edition || 'auto' }}"
 
