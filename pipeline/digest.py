@@ -68,7 +68,7 @@ def build_script(stories, label, date_text):
             prompt = (
                 "Write the spoken script for 'Regarding Maine', a Maine news podcast with ONE warm, "
                 f"conversational host. This is the {label.lower()} edition for {date_text}.\n"
-                "Rules: 1,300-1,700 words. Plain spoken English, no markdown, no stage directions, no "
+                "Rules: 1,700-2,000 words (the last draft ran short). Plain spoken English, no markdown, no stage directions, no "
                 "bullet lists. Open with a short greeting and a one-line preview. Cover every story in "
                 "order of the list, giving the most important ones more time. Credit the outlet aloud "
                 "('according to the Press Herald'). Never quote articles verbatim. Near the end add a "
